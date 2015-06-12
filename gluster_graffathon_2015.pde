@@ -11,15 +11,16 @@ int CANVAS_HEIGHT = 1080;
 float TEMPO = 123.0; // beats/minute
 float BEAT_DURATION = 60.0 / TEMPO; // seconds 
 int SKIP_DURATION = round(4.0 * 1000.0 * BEAT_DURATION); // milliseconds
+float PREDELAY_DURATION = 5.0; // seconds
 
 // Global state
 Minim minim;
 AudioPlayer song;
+boolean predelay = true; // are we still in the pre-delay period?
 
 void setupAudio() {
   minim = new Minim(this);
   song = minim.loadFile("assets/Vector Space Odyssey.mp3");
-  song.play();
 }
 
 float getSeconds() {
@@ -34,6 +35,7 @@ void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
   noStroke();
+  background(0);
   frameRate(60);
   fill(255);
   smooth();
@@ -43,6 +45,10 @@ void setup() {
 }
 
 void keyPressed() {
+  if(predelay) {
+    return;
+  }
+  
   if(key == CODED) {
     // Left/right arrow keys: seek song
     boolean isLeft = keyCode == LEFT;
@@ -64,6 +70,16 @@ void keyPressed() {
 }
 
 void draw() {
+  if(predelay) {
+    if(0.001 * millis() < PREDELAY_DURATION) {
+      return;      
+    }
+    
+    // Predelay ended, start the song
+    predelay = false;
+    song.play();
+  }
+  
   float beat = getBeats();
   float beat_flash = 1.0 - beat % 1.0; 
   
@@ -75,3 +91,4 @@ void draw() {
   
   text("" + beat, 20, 0.5 * CANVAS_HEIGHT);
 }
+
