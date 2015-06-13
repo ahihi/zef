@@ -36,6 +36,7 @@ void setup() {
 
   noStroke();
   background(0);
+  rectMode(CENTER);
   frameRate(60);
   fill(255);
   smooth();
@@ -69,6 +70,39 @@ void keyPressed() {
   }
 }
 
+void stairs(int time) {
+  pushMatrix();
+  rotateY(time * 0.0005);
+  fill(100, 100, 100);
+  int towerWidth = CANVAS_WIDTH/4;
+  int towerHeight = CANVAS_HEIGHT;
+  box(towerWidth, towerHeight, towerWidth);
+  
+  int amountOfStairs = 5;
+  int stairWidth = (CANVAS_WIDTH/4)/amountOfStairs;
+  int stairHeight = 8;
+  int stairDepth = 20;
+  int heightDifferenceBetweenSteps = (int) (1.7 * stairHeight);
+  translate(-CANVAS_WIDTH/8 - stairWidth/2, CANVAS_HEIGHT/4, (towerWidth + stairDepth)/2);
+  
+  for (int i = 0; i < amountOfStairs; i++) {
+    fill(100, 100, 150);
+    translate(stairWidth, -heightDifferenceBetweenSteps, 0);
+    box(stairWidth, stairHeight, stairDepth);
+  }
+  
+  translate(stairWidth+(stairDepth-stairWidth)/2, 0, (stairDepth-stairWidth)/2);
+  rotateY(PI/2);
+  
+  for (int i = 0; i < amountOfStairs; i++) {
+    fill(200, 100, 150);
+    box(stairWidth, stairHeight, stairDepth);
+    translate(stairWidth, -heightDifferenceBetweenSteps, 0);
+  }
+
+  popMatrix();
+}
+
 void draw() {
   if(predelay) {
     if(0.001 * millis() < PREDELAY_DURATION) {
@@ -80,8 +114,17 @@ void draw() {
     song.play();
   }
   
+  resetMatrix();
+  clear();
+  
   float beat = getBeats();
-  float beat_flash = 1.0 - beat % 1.0; 
+  float beat_flash = 1.0 - beat % 1.0;
+  
+  int time = millis();
+  
+  translate(0,0,-0.6*CANVAS_WIDTH); // needed in 3D mode
+  
+  // EFFECTS:
   
   if(beat % 2.0 < 1.0) {
     background(255.0 * 0.33 * beat_flash, 0, 0);    
@@ -90,5 +133,7 @@ void draw() {
   }
   
   text("" + beat, 20, 0.5 * CANVAS_HEIGHT);
+  
+  stairs(time);
 }
 
