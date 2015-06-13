@@ -97,6 +97,7 @@ class TestScene extends Scene {
   }
   
   void setup() {
+    resetShader();
     textSize(32);
     noStroke();
     fill(255);    
@@ -109,6 +110,29 @@ class TestScene extends Scene {
       background(255, 0, 0);
     }
     text("" + beats, 10, 0.5 * CANVAS_HEIGHT);
+  }
+}
+
+class ShadertoyScene extends Scene {
+  public PShader shader;
+  
+  public ShadertoyScene(float duration, String shaderPath) {
+    super(duration);
+    this.shader = loadShader(shaderPath);
+  }
+  
+  public void setup() {
+    shader(this.shader);
+    noSmooth();
+    background(0);
+    fill(255);
+  }
+  
+  public void draw(float beats) {
+    this.shader.set("iBeats", beats);
+    this.shader.set("iGlobalTime", beatsToSecs(beats));
+    this.shader.set("iResolution", float(CANVAS_WIDTH), float(CANVAS_HEIGHT));
+    rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
 }
 
@@ -171,8 +195,7 @@ void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
   timeline = new Timeline(this, "assets/Vector Space Odyssey.mp3");
-  timeline.addScene(new TestScene(16.0, false));
-  timeline.addScene(new TestScene(16.0, true));
+  timeline.addScene(new ShadertoyScene(64.0, "assets/tunnel.frag"));
 
   frameRate(60);
   background(0);
