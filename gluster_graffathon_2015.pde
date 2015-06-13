@@ -136,6 +136,125 @@ class ShadertoyScene extends Scene {
   }
 }
 
+class SnowflakeScene extends Scene {
+  
+  public SnowflakeScene(float duration) {
+    super(duration);
+  }
+  
+  void setup() {
+    noStroke();
+  }
+  
+  void tree(int time, int level, int branches, float x, float y, float angle, boolean firstRun) {
+    if (level < 0){ 
+      return; 
+    }
+    
+    //vasen
+    float x2 = x + (level * 0.1 * sin(angle) * (1.0 + 0.1*sin(time*0.0005*(level+1))));
+    float y2 = y + (level * 0.1 * cos(angle) * (1.0 + 0.1*sin(time*0.0005*(level+1))));
+    
+    if (!firstRun) {
+      stroke(255, 255, 255, 20 + 10*sin(time*0.001));
+      strokeWeight(level/5.0 + 0.1);
+      line(x,y,x2,y2);
+      
+      stroke(255, 255, 255, 30 + 30*sin(time*0.001));
+      strokeWeight(level/15.0 + 0.1);
+      line(x,y,x2,y2);
+      
+      stroke(255, 255, 255, 100 + 50*sin(time*0.001));
+      strokeWeight(level/30.0 + 0.1);
+      line(x,y,x2,y2);
+    }
+    
+    if (!firstRun) {
+      tree(time, level-1, branches, x2, y2, radians(0)+angle, false);      
+      tree(time, level-1, branches, x2, y2, radians(40)+angle, false);      
+      tree(time, level-1, branches, x2, y2, radians(-40)+angle, false);
+    }
+    else {
+      for (int i = 0; i < branches; i++) {
+        tree(time, level-1, branches, x2, y2, radians(i * 360/branches)+angle, false);
+      }
+    }
+  }
+
+  void effectTree(int time, int level, float angle) {
+      if (level == 0){ 
+        return; 
+      }
+      
+      pushMatrix();
+      
+      fill(255, 255, 255, 80 + 50*sin(time*0.001));
+      
+      //translate(0, -1, 0);
+      
+      float scaleValue = 0.25;
+      scale(scaleValue);
+      
+      stroke(255);
+      strokeWeight(1);
+  
+  // tree(int time, int level, int branches, float x, float y, float angle, boolean firstRun) {
+  
+      createFallingSnowFlake(time, level, 5, 0, -1, 0, true);
+      
+      createFallingSnowFlake(time, level - 1, 6, -2, 0, 0, true);
+      
+      createFallingSnowFlake(time, level,     5, 1, 3, 0, true);
+        
+      createFallingSnowFlake(time, level - 1, 6, 5, -3, 0, true);
+      
+      createFallingSnowFlake(time, level - 1, 6, -4, 1, 0, true);
+    
+      createFallingSnowFlake(time, level - 1, 6, 3.5, -1, 0, true);
+      
+      createFallingSnowFlake(time, level - 1,     5, 2, 5, 0, true);
+      
+      createFallingSnowFlake(time, level - 1,     5, -1, -3, 0, true);
+      
+      createFallingSnowFlake(time, level,     6, -1, -1.5, 0, true);
+      
+      createFallingSnowFlake(time, level - 2,     6, -2, 4, 0, true);
+    
+      scale(0.03);
+      translate(0, -5, 0);
+      rotateX(radians(180));
+      noStroke();
+      textSize(30);
+      text("snowflakes", 20 + sin(time*0.001), 130 + sin(time*0.001), 0);
+    
+      popMatrix();
+  }
+  
+  void createFallingSnowFlake(int time, int level, int branches, float x, float y, float angle, boolean isFirstCall) {
+      pushMatrix();
+      float yTranslate = 10 - (time*(0.0005 + 0.0005 * abs(y)/2.0) % (20));
+      
+      translate(x -1 + 2*sin(time*0.0005 + x), yTranslate);
+      rotateZ(radians(time*0.005));
+      
+      tree(time, level, branches, x, y, angle, true);
+      
+      popMatrix();
+  }
+  
+  void draw(float beats) {
+    resetMatrix();
+    translate(0,0,-800); // needed in 3D mode
+    scale((CANVAS_WIDTH/2.0)/ASPECT_RATIO, -CANVAS_HEIGHT/2.0);
+    clear();
+
+    background(0);
+    
+    float time = beats * 1000;
+    effectTree((int)time, 5, 0);
+  }
+}
+
 class StairsScene extends Scene {
   PShader shader;
   
@@ -215,6 +334,7 @@ class StairsScene extends Scene {
 // Constants
 int CANVAS_WIDTH = 1024;
 int CANVAS_HEIGHT = 768;
+float ASPECT_RATIO = (float)CANVAS_WIDTH/CANVAS_HEIGHT;
 float TEMPO = 123.0; // beats/minute
 float BEAT_DURATION = 60.0 / TEMPO; // seconds 
 int SKIP_DURATION = round(4.0 * 1000.0 * BEAT_DURATION); // milliseconds
@@ -228,6 +348,7 @@ void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
   timeline = new Timeline(this, "assets/Vector Space Odyssey.mp3");
+  //timeline.addScene(new SnowflakeScene(20.0));
   timeline.addScene(new StairsScene(64.0));
   timeline.addScene(new ShadertoyScene(64.0, "assets/tunnel.frag"));
 
