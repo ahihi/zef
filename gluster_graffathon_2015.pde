@@ -137,30 +137,51 @@ class ShadertoyScene extends Scene {
 }
 
 class StairsScene extends Scene {
+  PShader shader;
+  
   public StairsScene(float duration) {
     super(duration);
   }
   
   void setup() {
     noStroke();
+
+    //shader = loadShader("shaderLumian.glsl");
+    //shader = loadShader("noise.glsl");
+    shader = loadShader("clouds.glsl");
+    shader.set("iResolution", (float)CANVAS_WIDTH, (float)CANVAS_HEIGHT);
   }
   
   void draw(float beats) {
     clear();
     
     int time = round(beatsToSecs(beats) * 1000.0);
+    
+    /*if (beats%4.0 < 1.0) {
+      shader.set("iGlobalTime", 2.0);
+    }
+    else {*/
+      shader.set("iGlobalTime", (float)sin(time*0.001));
+    //}
 
     pushMatrix();
-    translate(0,0,-0.6*CANVAS_WIDTH); // needed in 3D mode
+
+    translate(CANVAS_WIDTH/2, CANVAS_HEIGHT/2,-0.3*CANVAS_WIDTH); // needed in 3D mode
     lights();
     rotateY(-time * 0.0005);
     translate(0, time * 0.05, 0);
     fill(100, 100, 100);
-    float towerWidth = CANVAS_WIDTH/6;
-    
+    float towerWidth = CANVAS_WIDTH/4;
     int towerHeight = 4*CANVAS_HEIGHT;
     translate(0, -CANVAS_HEIGHT, 0);
+    
+    //filter(shader);
+    
+    shader(shader);
     box(towerWidth, towerHeight, towerWidth);
+    resetShader();
+    
+
     
     int amountOfStairs = 5;
     float stairWidth = towerWidth/amountOfStairs;
@@ -192,8 +213,8 @@ class StairsScene extends Scene {
 }
 
 // Constants
-int CANVAS_WIDTH = 1920/2;
-int CANVAS_HEIGHT = 1080/2;
+int CANVAS_WIDTH = 1024;
+int CANVAS_HEIGHT = 768;
 float TEMPO = 123.0; // beats/minute
 float BEAT_DURATION = 60.0 / TEMPO; // seconds 
 int SKIP_DURATION = round(4.0 * 1000.0 * BEAT_DURATION); // milliseconds
@@ -207,6 +228,7 @@ void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
   timeline = new Timeline(this, "assets/Vector Space Odyssey.mp3");
+  timeline.addScene(new StairsScene(64.0));
   timeline.addScene(new ShadertoyScene(64.0, "assets/tunnel.frag"));
 
   frameRate(60);
