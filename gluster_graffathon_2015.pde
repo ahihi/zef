@@ -113,6 +113,16 @@ class TestScene extends Scene {
   }
 }
 
+class BlankScene extends Scene {
+  public BlankScene(float duration) {
+    super(duration);
+  }  
+  
+  public void setup() {
+    background(0);    
+  }
+}
+
 class ShadertoyScene extends Scene {
   public PShader shader;
   
@@ -122,17 +132,16 @@ class ShadertoyScene extends Scene {
   }
   
   public void setup() {
-    shader(this.shader);
     noSmooth();
-    background(0);
     fill(255);
   }
   
   public void draw(float beats) {
+    background(255);
+    filter(this.shader);
+    this.shader.set("iResolution", float(CANVAS_WIDTH), float(CANVAS_HEIGHT));
     this.shader.set("iBeats", beats);
     this.shader.set("iGlobalTime", beatsToSecs(beats));
-    this.shader.set("iResolution", float(CANVAS_WIDTH), float(CANVAS_HEIGHT));
-    rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
 }
 
@@ -343,7 +352,6 @@ class StairsScene extends Scene {
     shader.set("iGlobalTime", (float)sin(time*0.001));
 
     pushMatrix();
-
     translate(CANVAS_WIDTH/2, CANVAS_HEIGHT/2,-0.3*CANVAS_WIDTH); // needed in 3D mode
     lights();
     rotateY(-time * 0.0005);
@@ -382,7 +390,7 @@ class StairsScene extends Scene {
       }
       
       rotateY(PI/2);
-  
+      
       translate((stairDepth)/2, 0, (stairDepth)/2);
     }
 
@@ -457,7 +465,7 @@ float ASPECT_RATIO = (float)CANVAS_WIDTH/CANVAS_HEIGHT;
 float TEMPO = 123.0; // beats/minute
 float BEAT_DURATION = 60.0 / TEMPO; // seconds 
 int SKIP_DURATION = round(4.0 * 1000.0 * BEAT_DURATION); // milliseconds
-float PREDELAY_DURATION = 5.0; // seconds
+float PREDELAY_DURATION = 0.0; // seconds
 
 // Global state
 Timeline timeline;
@@ -471,8 +479,8 @@ void setup() {
   timeline.addScene(new SnowflakeScene(60.0));
   timeline.addScene(new RotatingObjectScene(60.0));
   timeline.addScene(new StairsScene(64.0));
+  // Tunnel should start at 64 beats
   timeline.addScene(new ShadertoyScene(64.0, "assets/tunnel.frag"));
-  
 
   frameRate(60);
   background(0);
@@ -513,7 +521,8 @@ void draw() {
     
     // Predelay ended, start the song
     predelay = false;
-    timeline.song.play();
+    float offset = 0.0;
+    timeline.song.play(round(offset * 1000.0 * BEAT_DURATION));
   }
   
   timeline.drawScene();
