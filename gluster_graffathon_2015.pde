@@ -137,9 +137,13 @@ class ShadertoyScene extends Scene {
 }
 
 class SnowflakeScene extends Scene {
+  PShader shader;
   
   public SnowflakeScene(float duration) {
     super(duration);
+    
+    shader = loadShader("clouds.glsl");
+    shader.set("iResolution", (float)CANVAS_WIDTH, (float)CANVAS_HEIGHT);
   }
   
   void setup() {
@@ -190,16 +194,12 @@ class SnowflakeScene extends Scene {
       
       fill(255, 255, 255, 80 + 50*sin(time*0.001));
       
-      //translate(0, -1, 0);
-      
       float scaleValue = 0.25;
       scale(scaleValue);
       
       stroke(255);
       strokeWeight(1);
-  
-  // tree(int time, int level, int branches, float x, float y, float angle, boolean firstRun) {
-  
+
       createFallingSnowFlake(time, level, 5, 0, -1, 0, true);
       
       createFallingSnowFlake(time, level - 1, 6, -2, 0, 0, true);
@@ -223,16 +223,13 @@ class SnowflakeScene extends Scene {
       scale(0.03);
       translate(0, -5, 0);
       rotateX(radians(180));
-      noStroke();
-      textSize(30);
-      text("snowflakes", 20 + sin(time*0.001), 130 + sin(time*0.001), 0);
     
       popMatrix();
   }
   
   void createFallingSnowFlake(int time, int level, int branches, float x, float y, float angle, boolean isFirstCall) {
       pushMatrix();
-      float yTranslate = 10 - (time*(0.0005 + 0.0005 * abs(y)/2.0) % (20));
+      float yTranslate = 20 - (time*(0.0005 + 0.0005 * abs(y)/2.0) % (40));
       
       translate(x -1 + 2*sin(time*0.0005 + x), yTranslate);
       rotateZ(radians(time*0.005));
@@ -243,8 +240,8 @@ class SnowflakeScene extends Scene {
   }
   
   void draw(float beats) {
-    resetMatrix();
-    translate(0,0,-800); // needed in 3D mode
+    pushMatrix();
+    translate(CANVAS_WIDTH/2.0, CANVAS_HEIGHT/2, -800); // needed in 3D mode
     scale((CANVAS_WIDTH/2.0)/ASPECT_RATIO, -CANVAS_HEIGHT/2.0);
     clear();
 
@@ -252,6 +249,14 @@ class SnowflakeScene extends Scene {
     
     float time = beats * 1000;
     effectTree((int)time, 5, 0);
+    
+    popMatrix();
+    
+    shader.set("iGlobalTime", (float)beats);
+    shader(shader);
+    fill(100, 100, 100, 0.5);
+    rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    resetShader();
   }
 }
 
@@ -260,15 +265,13 @@ class StairsScene extends Scene {
   
   public StairsScene(float duration) {
     super(duration);
+
+    shader = loadShader("clouds.glsl");
+    shader.set("iResolution", (float)CANVAS_WIDTH, (float)CANVAS_HEIGHT);
   }
   
   void setup() {
     noStroke();
-
-    //shader = loadShader("shaderLumian.glsl");
-    //shader = loadShader("noise.glsl");
-    shader = loadShader("clouds.glsl");
-    shader.set("iResolution", (float)CANVAS_WIDTH, (float)CANVAS_HEIGHT);
   }
   
   void draw(float beats) {
@@ -276,12 +279,7 @@ class StairsScene extends Scene {
     
     int time = round(beatsToSecs(beats) * 1000.0);
     
-    /*if (beats%4.0 < 1.0) {
-      shader.set("iGlobalTime", 2.0);
-    }
-    else {*/
-      shader.set("iGlobalTime", (float)sin(time*0.001));
-    //}
+    shader.set("iGlobalTime", (float)sin(time*0.001));
 
     pushMatrix();
 
@@ -333,26 +331,24 @@ class StairsScene extends Scene {
   }
 }
 
-class MetallicObjectScene extends Scene {
+class RotatingObjectScene extends Scene {
   PShader shader;
   PShader shader2;
   PShape metalObject;
   
-  public MetallicObjectScene(float duration) {
+  public RotatingObjectScene(float duration) {
     super(duration);
-  }
-  
-  void setup() {
-    noStroke();
-
+    
     metalObject = loadShape("metalObject.obj");
 
     shader = loadShader("lines.glsl");
     shader2 = loadShader("shaderLumian.glsl");
-    //shader = loadShader("noise.glsl");
-    //shader = loadShader("clouds.glsl");
     shader.set("iResolution", (float)CANVAS_WIDTH, (float)CANVAS_HEIGHT);
     shader2.set("iResolution", (float)CANVAS_WIDTH, (float)CANVAS_HEIGHT);
+  }
+  
+  void setup() {
+    noStroke();
   }
   
   void draw(float beats) {
@@ -410,8 +406,8 @@ void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
   timeline = new Timeline(this, "assets/Vector Space Odyssey.mp3");
-  //timeline.addScene(new SnowflakeScene(20.0));
-  timeline.addScene(new MetallicObjectScene(50.0));
+  timeline.addScene(new SnowflakeScene(60.0));
+  timeline.addScene(new RotatingObjectScene(60.0));
   timeline.addScene(new StairsScene(64.0));
   timeline.addScene(new ShadertoyScene(64.0, "assets/tunnel.frag"));
 
