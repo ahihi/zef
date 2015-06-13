@@ -136,6 +136,67 @@ class ShadertoyScene extends Scene {
   }
 }
 
+class CreditsScene extends Scene {
+  public PShader shader;
+  
+  public CreditsScene(float duration) {
+    super(duration);
+    this.shader = loadShader("noise.glsl");
+    this.shader.set("iResolution", float(CANVAS_WIDTH), float(CANVAS_HEIGHT));
+  }
+  
+  public void setup() {
+    noStroke();
+    frameRate(30);
+    fill(255);
+    smooth();
+  }
+  
+  void effectMatrix(int time) {
+    String texts[] = {"Credits", "", "code", "{", "Kitai", "ahihi", "Lumian", "}", "", "music", "{", "ahihi", "}", "", "@ Graffathon 2015"};
+    float speeds[] = {1, 0, 1.5, 1.25, 1, 1.5, 1, 1.25, 0, 1.5, 1.25, 1.5, 1.25, 1, 1};
+    
+    pushMatrix();
+      scale(0.003);
+      rotateX(radians(180));
+      fill(255, 255, 255, 80 + 50*sin(time*0.001));
+      noStroke();
+      textSize(40);
+  
+      for (int i = 0; i < texts.length; i++) {
+        for (int j = 0; j < texts[i].length(); j++) {
+          float randomNumber = random(10);
+          
+          if (randomNumber < 7) {
+            text(texts[i].charAt(j), i*50 + sin(time*0.001), j*40 -300 + 300*sin(time*0.0001*speeds[i]), 0);
+          }
+          else {
+            text((char) int(random(33, 127)), i*50 + sin(time*0.001), j*40 -300 + 300*sin(time*0.0001*speeds[i]), 0);
+          }
+        }
+      }
+      
+      popMatrix();
+  }
+  
+  public void draw(float beats) {
+    clear();
+    
+    pushMatrix();
+      translate(0,CANVAS_HEIGHT/2.0,-800); // needed in 3D mode
+      scale(1.5*(CANVAS_WIDTH/2.0)/ASPECT_RATIO, -CANVAS_HEIGHT/2.0);
+      effectMatrix((int)(beats * 1000));
+    popMatrix();
+    
+    this.shader.set("iGlobalTime", beatsToSecs(beats));
+    
+    fill(0,0,0,0);
+    shader(shader);
+    rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    resetShader();
+  }
+}
+
 class SnowflakeScene extends Scene {
   PShader shader;
   
@@ -406,10 +467,12 @@ void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
   timeline = new Timeline(this, "assets/Vector Space Odyssey.mp3");
+  timeline.addScene(new CreditsScene(60.0));
   timeline.addScene(new SnowflakeScene(60.0));
   timeline.addScene(new RotatingObjectScene(60.0));
   timeline.addScene(new StairsScene(64.0));
   timeline.addScene(new ShadertoyScene(64.0, "assets/tunnel.frag"));
+  
 
   frameRate(60);
   background(0);
