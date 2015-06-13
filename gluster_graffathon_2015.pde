@@ -123,6 +123,63 @@ class BlankScene extends Scene {
   }
 }
 
+class CylinderScene extends Scene {
+  PShader stardust;
+  PShape cylinder;
+  PImage texture;
+  
+  public CylinderScene(float duration) {
+    super(duration);
+    stardust = loadShader("stardust.glsl");
+    stardust.set("iResolution", (float)width, (float)height);
+    cylinder = loadShape("AbstractSylinder.obj");
+    texture = loadImage("sheetmetal.jpg");
+  }
+  
+  void setup() {
+    
+    noStroke();      
+    textureWrap(REPEAT);
+    textureMode(NORMAL);    
+  }
+  
+  void draw(float beats) {
+      pushMatrix();
+      clear();
+      rectMode(CORNER);
+      shader(stardust);
+      stardust.set("iGlobalTime", (float)millis()*0.001);
+      hint(DISABLE_DEPTH_TEST);
+      rect(0, 0, width, height);
+      hint(ENABLE_DEPTH_TEST);
+      resetShader();
+      
+      beginCamera();
+        camera(0, 0, 10, 0, 0, 0, 0, 1, 0);
+        float fov = PI/3.0;
+        float cameraZ = (height/2.0) / tan(fov/2.0);
+        perspective(fov, float(width)/float(height), cameraZ/100.0, cameraZ*10.0);
+        
+        directionalLight(126, 126, 126, 0, 0, -1);
+        ambientLight(102, 102, 102);
+          
+          pushMatrix();      
+      
+            rotateZ(PI/2.0);
+            rotateX(-5.8);
+            rotateY(millis()*0.0005);
+            
+            beginShape();
+            texture(texture);
+            tint(0, 153, 204);
+            shape(cylinder);
+            endShape();
+          popMatrix();
+      endCamera();
+      popMatrix();
+      }
+}
+
 class ShadertoyScene extends Scene {
   public PShader shader;
   
@@ -475,6 +532,7 @@ void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
   timeline = new Timeline(this, "assets/Vector Space Odyssey.mp3");
+  timeline.addScene(new CylinderScene(60.0));
   timeline.addScene(new CreditsScene(60.0));
   timeline.addScene(new SnowflakeScene(60.0));
   timeline.addScene(new RotatingObjectScene(60.0));
