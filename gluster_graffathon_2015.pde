@@ -328,6 +328,68 @@ class StairsScene extends Scene {
     }
 
     popMatrix();
+    
+    resetShader();
+  }
+}
+
+class MetallicObjectScene extends Scene {
+  PShader shader;
+  PShader shader2;
+  PShape metalObject;
+  
+  public MetallicObjectScene(float duration) {
+    super(duration);
+  }
+  
+  void setup() {
+    noStroke();
+
+    metalObject = loadShape("metalObject.obj");
+
+    shader = loadShader("lines.glsl");
+    shader2 = loadShader("shaderLumian.glsl");
+    //shader = loadShader("noise.glsl");
+    //shader = loadShader("clouds.glsl");
+    shader.set("iResolution", (float)CANVAS_WIDTH, (float)CANVAS_HEIGHT);
+    shader2.set("iResolution", (float)CANVAS_WIDTH, (float)CANVAS_HEIGHT);
+  }
+  
+  void draw(float beats) {
+    clear();
+    
+    int time = round(beatsToSecs(beats) * 1000.0);
+
+    pushMatrix();
+
+    translate(CANVAS_WIDTH/2, CANVAS_HEIGHT/2,-0.3*CANVAS_WIDTH); // needed in 3D mode
+    lights();
+    
+    if (beats%2 < 1.0) {
+      scale(15.0);
+    }
+    else {
+      scale(14.0);
+    }
+    
+    this.shader.set("iGlobalTime", beatsToSecs(beats));
+    this.shader2.set("iGlobalTime", beatsToSecs(beats));
+    
+    rotateX(sin(time*0.001));
+    rotateY(cos(time*0.0001));
+    rotateZ(sin(time*0.0001)*cos(time*0.001));
+    translate(10*sin(time*0.001), 10*cos(time*0.001), sin(time*0.01));
+    shader(shader2);
+    shape(metalObject, 0, 0);
+    resetShader();
+
+    popMatrix();
+    
+    shader(shader);
+    fill(100, 100, 100, 0.5);
+    rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    
+    resetShader();
   }
 }
 
@@ -349,6 +411,7 @@ void setup() {
 
   timeline = new Timeline(this, "assets/Vector Space Odyssey.mp3");
   //timeline.addScene(new SnowflakeScene(20.0));
+  timeline.addScene(new MetallicObjectScene(50.0));
   timeline.addScene(new StairsScene(64.0));
   timeline.addScene(new ShadertoyScene(64.0, "assets/tunnel.frag"));
 
