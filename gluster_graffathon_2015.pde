@@ -6,8 +6,8 @@ import ddf.minim.ugens.*;
 import ddf.minim.effects.*;
 
 // Constants
-int CANVAS_WIDTH = 1920;
-int CANVAS_HEIGHT = 1080;
+int CANVAS_WIDTH = 1024;
+int CANVAS_HEIGHT = 768;
 float TEMPO = 123.0; // beats/minute
 float BEAT_DURATION = 60.0 / TEMPO; // seconds 
 int SKIP_DURATION = round(4.0 * 1000.0 * BEAT_DURATION); // milliseconds
@@ -70,36 +70,50 @@ void keyPressed() {
   }
 }
 
-void stairs(int time) {
+void stairs(int time, float beat) {
   pushMatrix();
-  rotateY(time * 0.0005);
+  
+  lights();
+  rotateY(-time * 0.0005);
+  translate(0, time * 0.05, 0);
   fill(100, 100, 100);
-  int towerWidth = CANVAS_WIDTH/4;
-  int towerHeight = CANVAS_HEIGHT;
+  float towerWidth = CANVAS_WIDTH/6;
+  
+  int towerHeight = 4*CANVAS_HEIGHT;
+  translate(0, -CANVAS_HEIGHT, 0);
   box(towerWidth, towerHeight, towerWidth);
   
   int amountOfStairs = 5;
-  int stairWidth = (CANVAS_WIDTH/4)/amountOfStairs;
-  int stairHeight = 8;
-  int stairDepth = 20;
-  int heightDifferenceBetweenSteps = (int) (1.7 * stairHeight);
-  translate(-CANVAS_WIDTH/8 - stairWidth/2, CANVAS_HEIGHT/4, (towerWidth + stairDepth)/2);
+  float stairWidth = towerWidth/amountOfStairs;
+  float stairHeight = CANVAS_WIDTH/100;
+  float stairDepth = towerWidth/10;
+  //float stairDepth = stairWidth;
+  float heightDifferenceBetweenSteps = (int) (1.7 * stairHeight);
+  translate(-0.5*towerWidth, 1.1*CANVAS_HEIGHT, (towerWidth + stairDepth)/2);
   
-  for (int i = 0; i < amountOfStairs; i++) {
-    fill(100, 100, 150);
-    translate(stairWidth, -heightDifferenceBetweenSteps, 0);
-    box(stairWidth, stairHeight, stairDepth);
+  for (int k = 0; k < 28; k++) {
+    for (int i = 0; i < amountOfStairs; i++) {
+      fill(100+150/((i*k+k) + 1), 100, 150);
+      
+      if(beat % 2.0 < 1.0 && (i+k+time*0.001) % 3.0 < 1.0) {
+        fill(255, 255, 255);
+      }
+      
+      translate(stairWidth, -heightDifferenceBetweenSteps, 0);
+      box(stairWidth, stairHeight, stairDepth);
+    }
+    
+    rotateY(PI/2);
+
+    translate((stairDepth)/2, 0, (stairDepth)/2);
   }
   
-  translate(stairWidth+(stairDepth-stairWidth)/2, 0, (stairDepth-stairWidth)/2);
-  rotateY(PI/2);
-  
-  for (int i = 0; i < amountOfStairs; i++) {
+  /*for (int i = 0; i < amountOfStairs; i++) {
     fill(200, 100, 150);
     box(stairWidth, stairHeight, stairDepth);
     translate(stairWidth, -heightDifferenceBetweenSteps, 0);
   }
-
+*/
   popMatrix();
 }
 
@@ -134,6 +148,6 @@ void draw() {
   
   text("" + beat, 20, 0.5 * CANVAS_HEIGHT);
   
-  stairs(time);
+  stairs(time, beat);
 }
 
