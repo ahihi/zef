@@ -483,12 +483,16 @@ class StairsScene extends Scene {
 
 class StairsScene2 extends Scene {
   PShader shader;
+  PShader shader2;
   
   public StairsScene2(float duration) {
     super(duration);
 
-    shader = loadShader("clouds.glsl");
+    shader = loadShader("lines2.glsl");
     shader.set("iResolution", (float)CANVAS_WIDTH, (float)CANVAS_HEIGHT);
+    
+    shader2 = loadShader("lines3.glsl");
+    shader2.set("iResolution", (float)CANVAS_WIDTH, (float)CANVAS_HEIGHT);
   }
   
   void setup() {
@@ -501,22 +505,23 @@ class StairsScene2 extends Scene {
     int time = round(beatsToSecs(beats) * 1000.0);
     
     shader.set("iGlobalTime", (float)sin(time*0.001));
+    shader2.set("iGlobalTime", (float)sin((time+60)*0.001));
 
     pushMatrix();
     translate(CANVAS_WIDTH/2, CANVAS_HEIGHT/2,-0.3*CANVAS_WIDTH); // needed in 3D mode
     lights();
     rotateY(-time * 0.0005);
-    translate(0, time * 0.05, 0);
+    translate(0, time * 0.1, 0);
     fill(36, 36, 67);
-    float towerWidth = CANVAS_WIDTH/4;
+    float towerWidth = CANVAS_WIDTH/3;
     int towerHeight = 4*CANVAS_HEIGHT;
-    translate(0, -CANVAS_HEIGHT, 0);
+    translate(0, -2.0*CANVAS_HEIGHT, 0);
     
     //filter(shader);
     
-    shader(shader);
+    //shader(shader);
     //box(towerWidth, towerHeight, towerWidth);
-    resetShader();
+    //resetShader();
     
     
     int amountOfStairs = 5;
@@ -529,7 +534,7 @@ class StairsScene2 extends Scene {
     
     for (int k = 0; k < 28; k++) {
       for (int i = 0; i < amountOfStairs; i++) {
-        fill(36, 36, 67, 200/(i+1));
+        fill(36, 36, 67);
         
         if(beats % 2.0 < 1.0 && (i+k+time*0.001) % 3.0 < 1.0) {
           fill(152, 146, 193);
@@ -545,6 +550,14 @@ class StairsScene2 extends Scene {
     }
 
     popMatrix();
+    
+    shader(shader);
+    fill(100, 100, 100, 0.5);
+    rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    
+    shader(shader2);
+    fill(100, 100, 100, 0.5);
+    rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     
     resetShader();
   }
@@ -625,9 +638,10 @@ void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
   timeline = new Timeline(this, "assets/Vector Space Odyssey.mp3");
+  
   timeline.addScene(new SnowflakeScene(64.0));
   timeline.addScene(new CylinderScene(32.0));
-  timeline.addScene(new StairsScene(32.0));
+  timeline.addScene(new StairsScene2(32.0));
   timeline.addScene(new ShadertoyScene(64.0, "assets/tunnel.frag")); // start at 128
   
   timeline.addScene(new CreditsScene(60.0));
