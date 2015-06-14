@@ -546,7 +546,7 @@ class StairsScene2 extends Scene {
     pushMatrix();
     translate(CANVAS_WIDTH/2, CANVAS_HEIGHT/2,-0.3*CANVAS_WIDTH); // needed in 3D mode
     lights();
-    rotateY(-time * 0.0005);
+    rotateY(1.5*PI/2 + -time * 0.0005);
     translate(0, time * 0.1, 0);
     fill(36, 36, 67);
     float towerWidth = CANVAS_WIDTH/3;
@@ -565,10 +565,10 @@ class StairsScene2 extends Scene {
     float stairHeight = CANVAS_WIDTH/100;
     float stairDepth = stairWidth;
     //float stairDepth = stairWidth;
-    float heightDifferenceBetweenSteps = (int) (1.7 * stairHeight);
+    float heightDifferenceBetweenSteps = (int) (3.0 * stairHeight);
     translate(-0.5*towerWidth, 1.1*CANVAS_HEIGHT, (towerWidth + stairDepth)/2);
     
-    for (int k = 0; k < 28; k++) {
+    for (int k = 0; k < 30; k++) {
       for (int i = 0; i < amountOfStairs; i++) {
         fill(36, 36, 67);
         
@@ -582,7 +582,7 @@ class StairsScene2 extends Scene {
       
       rotateY(PI/2);
       
-      translate((stairDepth)/2, 0, (stairDepth)/2);
+      //translate((stairDepth)/2, 0, (stairDepth)/2);
     }
 
     popMatrix();
