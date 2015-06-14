@@ -238,17 +238,15 @@ class ShadertoyScene extends Scene {
     super(duration);
     this.shader = loadShader(shaderPath);
     shader(this.shader);
-    resetShader();
   }
   
-  public void setup() {
-    noSmooth();
-    
+  public void setup() {    
     fill(255);
+    rectMode(CORNER);
   }
   
   public void draw(float beats) {
-    background(255);
+    clear();
     shader(this.shader);
     this.shader.set("iResolution", float(CANVAS_WIDTH), float(CANVAS_HEIGHT));
     this.shader.set("iBeats", beats);
@@ -266,13 +264,15 @@ class RobotikScene extends ShadertoyScene {
   }
   
   public void draw(float beats) {
-    background(0);
+    //background(0);
+    clear();
     shader(this.shader);
     this.shader.set("iResolution", float(CANVAS_WIDTH), float(CANVAS_HEIGHT));
     this.shader.set("iBeats", beats);
     this.shader.set("iGlobalTime", beatsToSecs(beats));
     this.shader.set("iRotate", this.rotate);
     rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    resetShader();
   }
 }
 
@@ -621,6 +621,7 @@ class StairsScene2 extends Scene {
     
     shader(shader);
     fill(100, 100, 100, 0.5);
+    //rectMode(CENTER);
     rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     
     shader(shader2);
@@ -715,8 +716,6 @@ void setup() {
   timeline.addScene(new ShadertoyScene(64.0, "data/tunnel.frag")); // start at 128
   timeline.addScene(new RobotikScene(32.0, false));
   timeline.addScene(new RotatingObjectScene(36.0));
-  
-
   timeline.addScene(new RobotikScene(32.0, true));
   timeline.addScene(new CylinderScene(32.0));
   timeline.addScene(new GreezScene(32.0));
@@ -765,7 +764,7 @@ void draw() {
     
     // Predelay ended, start the song
     predelay = false;
-    float offset = 128.0 + 96.0 + 32.0;
+    float offset = 0.0;
     timeline.song.play(round(offset * 1000.0 * BEAT_DURATION));
   }
   
