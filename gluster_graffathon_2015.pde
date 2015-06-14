@@ -553,8 +553,8 @@ class StairsScene2 extends Scene {
     
     int time = round(beatsToSecs(beats) * 1000.0);
     
-    shader.set("iGlobalTime", (float)(time*0.0001));
-    shader2.set("iGlobalTime", (float)(0.2*CANVAS_HEIGHT*sin((time+60)*0.0001)));
+    shader.set("iGlobalTime", (float)(time*0.001));
+    shader2.set("iGlobalTime", (float)(time*0.001));
 
     pushMatrix();
     translate(CANVAS_WIDTH/2, CANVAS_HEIGHT/2,-0.3*CANVAS_WIDTH); // needed in 3D mode
