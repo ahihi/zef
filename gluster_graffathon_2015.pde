@@ -624,12 +624,12 @@ boolean predelay = true; // are we still in the pre-delay period?
 void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
-  timeline = new Timeline(this, "assets/Vector Space Odyssey.mp3");
+  timeline = new Timeline(this, "data/Vector Space Odyssey.mp3");
   timeline.addScene(new SnowflakeScene(64.0));
   timeline.addScene(new CylinderScene(32.0));
   timeline.addScene(new StairsScene(32.0));
-  timeline.addScene(new ShadertoyScene(64.0, "assets/robotik.frag"));
-  timeline.addScene(new ShadertoyScene(64.0, "assets/tunnel.frag")); // start at 128
+  timeline.addScene(new ShadertoyScene(64.0, "data/robotik.frag"));
+  timeline.addScene(new ShadertoyScene(64.0, "data/tunnel.frag")); // start at 128
   
   timeline.addScene(new CreditsScene(60.0));
   timeline.addScene(new RotatingObjectScene(60.0));
