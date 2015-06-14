@@ -44,7 +44,7 @@ vec4 getCloudColor(vec2 uv) {
 	vec3 cloudColor = vec3(0.0);
 		
 	for (int i = 1; i < 5; i++) {
-		vec2 p=(uv.xy+vec2(100.0))*10.0*float(i*i) + 11.;
+		vec2 p=(uv.xy+vec2(100.0))*10.0*float(i*i) + 11. + iGlobalTime;
 		float a=smoothNoise(float(int(p.x)), float(int(p.y)));
 		float b=smoothNoise(float(int(p.x)+1), float(int(p.y)));
 		float c=smoothNoise(float(int(p.x)), float(int(p.y)+1));
