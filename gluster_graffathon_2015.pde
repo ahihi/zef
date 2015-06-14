@@ -640,13 +640,13 @@ void setup() {
   timeline = new Timeline(this, "data/Vector Space Odyssey.mp3");
   timeline.addScene(new SnowflakeScene(64.0));
   timeline.addScene(new CylinderScene(32.0));
-  timeline.addScene(new StairsScene(32.0));
+  timeline.addScene(new StairsScene2(32.0));
   timeline.addScene(new ShadertoyScene(64.0, "data/robotik.frag"));
   timeline.addScene(new ShadertoyScene(64.0, "data/tunnel.frag")); // start at 128
   
   timeline.addScene(new CreditsScene(60.0));
   timeline.addScene(new RotatingObjectScene(60.0));
-  timeline.addScene(new StairsScene(64.0));
+  timeline.addScene(new StairsScene2(64.0));
 
   frameRate(60);
   background(0);
