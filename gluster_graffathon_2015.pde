@@ -308,7 +308,6 @@ class CreditsScene extends Scene {
   
   public void setup() {
     noStroke();
-    frameRate(30);
     fill(255);
     smooth();
   }
