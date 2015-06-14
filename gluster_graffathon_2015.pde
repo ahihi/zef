@@ -113,6 +113,42 @@ class TestScene extends Scene {
   }
 }
 
+class GreezScene extends Scene {
+  PShader sprunge;
+  
+  public GreezScene(float duration) {
+    super(duration);
+    sprunge = loadShader("sprunge.glsl");
+    sprunge.set("iResolution", (float)width, (float)height);
+  }
+  
+  void setup() {
+    rectMode(CORNER);
+    stroke(0);
+  }
+  
+  void draw(float beats) {
+    clear();
+    shader(sprunge);
+    sprunge.set("iGlobalTime", (float)millis()*0.001);
+    rect(0, 0, width, height);
+    resetShader();  
+    fill(0);
+    textSize(32);
+
+          
+    String[] groups = {"", "Peisik", "", "REN", "", "firebug", "", "sooda", "", "Epoch", "", "pants^", "", "Paraguay", "", "Mercury", "", "DOT"};
+    float timePerText = duration/groups.length;
+    float timePassed = 0.0;
+    
+    textAlign(CENTER, CENTER);
+    int i = floor(beats / duration * groups.length);
+    text(groups[i], width/2.0, height/2.0, 0);
+
+   
+  }
+}
+
 class BlankScene extends Scene {
   public BlankScene(float duration) {
     super(duration);
@@ -638,6 +674,7 @@ void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
   timeline = new Timeline(this, "data/Vector Space Odyssey.mp3");
+  timeline.addScene(new GreezScene(30.0));
   timeline.addScene(new SnowflakeScene(64.0));
   timeline.addScene(new CylinderScene(32.0));
   timeline.addScene(new StairsScene2(32.0));
