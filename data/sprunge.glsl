@@ -1,6 +1,7 @@
 uniform float iBeats;
 uniform float iGlobalTime;
 uniform vec2 iResolution;
+uniform float iSaturation;
 
 #define PI 3.141592653589793
 #define TAU 6.283185307179586
@@ -140,6 +141,10 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 		c.z * scale(0.0, 1.0, ml, mr, pow(c.z, mp))
 	);
 	
+    c = hsv2rgb(rgb2hsv(c) * vec3(1.0, iSaturation, 1.0));
+    
+    c *= vec3(1.0-length(p));
+    
 	fragColor = vec4(c, 1.0);
 }
 
