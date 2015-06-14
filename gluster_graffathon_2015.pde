@@ -622,8 +622,8 @@ class RotatingObjectScene extends Scene {
 }
 
 // Constants
-int CANVAS_WIDTH = 1920/2;
-int CANVAS_HEIGHT = 1080/2;
+int CANVAS_WIDTH = 1920/4;
+int CANVAS_HEIGHT = 1080/4;
 float ASPECT_RATIO = (float)CANVAS_WIDTH/CANVAS_HEIGHT;
 float TEMPO = 123.0; // beats/minute
 float BEAT_DURATION = 60.0 / TEMPO; // seconds 
@@ -637,12 +637,12 @@ boolean predelay = true; // are we still in the pre-delay period?
 void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
-  timeline = new Timeline(this, "assets/Vector Space Odyssey.mp3");
-  
+  timeline = new Timeline(this, "data/Vector Space Odyssey.mp3");
   timeline.addScene(new SnowflakeScene(64.0));
   timeline.addScene(new CylinderScene(32.0));
-  timeline.addScene(new StairsScene2(32.0));
-  timeline.addScene(new ShadertoyScene(64.0, "assets/tunnel.frag")); // start at 128
+  timeline.addScene(new StairsScene(32.0));
+  timeline.addScene(new ShadertoyScene(64.0, "data/robotik.frag"));
+  timeline.addScene(new ShadertoyScene(64.0, "data/tunnel.frag")); // start at 128
   
   timeline.addScene(new CreditsScene(60.0));
   timeline.addScene(new RotatingObjectScene(60.0));
