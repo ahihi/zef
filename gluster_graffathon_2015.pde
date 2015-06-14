@@ -155,7 +155,7 @@ class CylinderScene extends Scene {
       resetShader();
       
       beginCamera();
-        camera(0, 0, 10, 0, 0, 0, 0, 1, 0);
+        camera(0, 0, 14, 0, 0, 0, 0, 1, 0);
         float fov = PI/3.0;
         float cameraZ = (height/2.0) / tan(fov/2.0);
         perspective(fov, float(width)/float(height), cameraZ/100.0, cameraZ*10.0);
@@ -609,10 +609,10 @@ void setup() {
 
   timeline = new Timeline(this, "assets/Vector Space Odyssey.mp3");
   
+  timeline.addScene(new CylinderScene(60.0));
   timeline.addScene(new StairsScene(64.0));
   timeline.addScene(new SnowflakeScene(60.0));
   timeline.addScene(new RotatingObjectScene(60.0));
-  timeline.addScene(new CylinderScene(60.0));
   timeline.addScene(new CreditsScene(60.0));
   timeline.addScene(new RotatingObjectScene(60.0));
   // Tunnel should start at 64 beats
