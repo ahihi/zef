@@ -133,14 +133,15 @@ class GreezScene extends Scene {
     sprunge.set("iGlobalTime", (float)millis()*0.001);
     rect(0, 0, width, height);
     resetShader();  
-    fill(0);
-    textSize(32);
+    
 
           
     String[] groups = {"", "Peisik", "", "REN", "", "firebug", "", "sooda", "", "Epoch", "", "pants^", "", "Paraguay", "", "Mercury", "", "DOT"};
     float timePerText = duration/groups.length;
     float timePassed = 0.0;
     
+    fill(152, 146, 193);
+    textSize(32);
     textAlign(CENTER, CENTER);
     int i = floor(beats / duration * groups.length);
     text(groups[i], width/2.0, height/2.0, 0);
