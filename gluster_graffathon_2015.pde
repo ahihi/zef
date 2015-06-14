@@ -120,6 +120,7 @@ class GreezScene extends Scene {
     super(duration);
     sprunge = loadShader("sprunge.glsl");
     sprunge.set("iResolution", (float)width, (float)height);
+    
   }
   
   void setup() {
@@ -130,20 +131,28 @@ class GreezScene extends Scene {
   void draw(float beats) {
     clear();
     shader(sprunge);
-    sprunge.set("iGlobalTime", (float)millis()*0.001);
+    
+    String[] groups = {"", "<3", "", "Peisik", "", "REN", "", "firebug", "", "sooda", "", "Epoch", "", "pants^", "", "Paraguay", "", "Mercury", "", "DOT"};
+    int i = floor(beats / duration * groups.length);
+    
+    if(groups[i].equals(""))
+      sprunge.set("iSaturation", 1.0);
+    else
+      sprunge.set("iSaturation", 0.0);
+    sprunge.set("iGlobalTime", beatsToSecs(beats));
     rect(0, 0, width, height);
     resetShader();  
     
 
           
-    String[] groups = {"", "Peisik", "", "REN", "", "firebug", "", "sooda", "", "Epoch", "", "pants^", "", "Paraguay", "", "Mercury", "", "DOT"};
+    
     float timePerText = duration/groups.length;
     float timePassed = 0.0;
     
-    fill(152, 146, 193);
+    fill(255, 0, 100);
     textSize(32);
     textAlign(CENTER, CENTER);
-    int i = floor(beats / duration * groups.length);
+
     text(groups[i], width/2.0, height/2.0, 0);
 
    
