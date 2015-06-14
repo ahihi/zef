@@ -173,14 +173,16 @@ class CylinderScene extends Scene {
   PShader stardust;
   PShape cylinder;
   PImage texture;
+  boolean shakeIt;
   
-  public CylinderScene(float duration) {
+  public CylinderScene(float duration, boolean shakeIt) {
     super(duration);
     stardust = loadShader("stardust.glsl");
     stardust.set("iResolution", (float)width, (float)height);
     cylinder = loadShape("AbstractSylinder.obj");
     texture = loadImage("sheetmetal.jpg");
-  }
+    this.shakeIt = shakeIt;
+  } 
   
   void setup() {
     
@@ -210,7 +212,16 @@ class CylinderScene extends Scene {
         directionalLight(126, 126, 126, 0, 0, -1);
         ambientLight(102, 102, 102);
           
-          pushMatrix();      
+          pushMatrix();
+            if(shakeIt){
+              translate(0, sin(secs*150)*0.1, 0);
+            }
+            if(shakeIt && secs>5.0 && secs<6.0)
+              translate(sin(secs*200)*0.5, 0, 0);
+            if(shakeIt && secs>10 && secs<12)
+              translate(sin(secs*200)*0.5, 0, sin(secs*200)*0.25);
+            if(shakeIt && secs>12)
+              translate(sin(secs*200)*0.7, sin(secs*200)*0.5, sin(secs*200)*0.3);
       
             rotateZ(PI/2.0);
             rotateX(-5.8);
@@ -709,15 +720,15 @@ void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
   timeline = new Timeline(this, "data/Vector Space Odyssey.mp3");
-  
+  //timeline.addScene(new CylinderScene(32.0, true));
   timeline.addScene(new SnowflakeScene(64.0));
-  timeline.addScene(new CylinderScene(32.0));
+  timeline.addScene(new CylinderScene(32.0, false));
   timeline.addScene(new StairsScene2(32.0));
   timeline.addScene(new ShadertoyScene(64.0, "data/tunnel.frag")); // start at 128
   timeline.addScene(new RobotikScene(32.0, false));
   timeline.addScene(new RotatingObjectScene(36.0));
   timeline.addScene(new RobotikScene(32.0, true));
-  timeline.addScene(new CylinderScene(32.0));
+  timeline.addScene(new CylinderScene(32.0, true));
   timeline.addScene(new GreezScene(32.0));
 
   timeline.addScene(new CreditsScene(60.0));
@@ -764,7 +775,7 @@ void draw() {
     
     // Predelay ended, start the song
     predelay = false;
-    float offset = 0.0;
+    float offset = 290.0;
     timeline.song.play(round(offset * 1000.0 * BEAT_DURATION));
   }
   
