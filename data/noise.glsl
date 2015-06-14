@@ -24,5 +24,15 @@ void main()
 	
 	vec3 color = vec3(smoothNoise(uv.x, uv.y));
 	
-	gl_FragColor = vec4(color,0.5);
+	float aspect = iResolution.x/iResolution.y;
+	float u = gl_FragCoord.x * 2.0 / iResolution.x - 1.0;
+	float v = gl_FragCoord.y * 2.0 / iResolution.y - 1.0;
+	u*=aspect;
+	u/=10.0;
+	v/=10.0;
+	uv= vec2(u,v);
+	
+	float corners = min(length(uv), 0.25);
+	
+	gl_FragColor = vec4(color,0.4) - vec4(corners);
 }

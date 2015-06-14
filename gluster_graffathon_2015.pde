@@ -262,6 +262,7 @@ class CreditsScene extends Scene {
   
   public CreditsScene(float duration) {
     super(duration);
+    resetShader();
     this.shader = loadShader("noise.glsl");
     this.shader.set("iResolution", float(CANVAS_WIDTH), float(CANVAS_HEIGHT));
   }
@@ -307,14 +308,15 @@ class CreditsScene extends Scene {
       translate(0,CANVAS_HEIGHT/2.0,-800); // needed in 3D mode
       scale(1.5*(CANVAS_WIDTH/2.0)/ASPECT_RATIO, -CANVAS_HEIGHT/2.0);
       effectMatrix((int)(beats * 1000));
+    
+      this.shader.set("iGlobalTime", beatsToSecs(beats));
+      
+      
+      shader(shader);
+      rectMode(CENTER);
+      rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      resetShader();
     popMatrix();
-    
-    this.shader.set("iGlobalTime", beatsToSecs(beats));
-    
-    fill(0,0,0,0);
-    shader(shader);
-    rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    resetShader();
   }
 }
 
@@ -542,6 +544,7 @@ class StairsScene2 extends Scene {
   }
   
   void setup() {
+    resetShader();
     noStroke();
   }
   
@@ -550,8 +553,8 @@ class StairsScene2 extends Scene {
     
     int time = round(beatsToSecs(beats) * 1000.0);
     
-    shader.set("iGlobalTime", (float)sin(time*0.001));
-    shader2.set("iGlobalTime", (float)sin((time+60)*0.001));
+    shader.set("iGlobalTime", (float)(time*0.0001));
+    shader2.set("iGlobalTime", (float)(0.2*CANVAS_HEIGHT*sin((time+60)*0.0001)));
 
     pushMatrix();
     translate(CANVAS_WIDTH/2, CANVAS_HEIGHT/2,-0.3*CANVAS_WIDTH); // needed in 3D mode
@@ -617,6 +620,8 @@ class RotatingObjectScene extends Scene {
   public RotatingObjectScene(float duration) {
     super(duration);
     
+    resetShader();
+    
     metalObject = loadShape("metalObject.obj");
 
     shader = loadShader("lines.glsl");
@@ -668,8 +673,8 @@ class RotatingObjectScene extends Scene {
 }
 
 // Constants
-int CANVAS_WIDTH = 1920/4;
-int CANVAS_HEIGHT = 1080/4;
+int CANVAS_WIDTH = 1024;
+int CANVAS_HEIGHT = 768;
 float ASPECT_RATIO = (float)CANVAS_WIDTH/CANVAS_HEIGHT;
 float TEMPO = 123.0; // beats/minute
 float BEAT_DURATION = 60.0 / TEMPO; // seconds 
@@ -684,6 +689,7 @@ void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
   timeline = new Timeline(this, "data/Vector Space Odyssey.mp3");
+  
   timeline.addScene(new GreezScene(30.0));
   timeline.addScene(new SnowflakeScene(64.0));
   timeline.addScene(new CylinderScene(32.0));
