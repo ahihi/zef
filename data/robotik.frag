@@ -270,8 +270,11 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     vec3 color;
     
     if(mr.material == NO_MATERIAL) {
+        vec3 sky_color = iRotate
+                       ? vec3(0.14, 0.14, 0.26)
+                       : vec3(0.35, 0.21, 0.26);
         float sky_mix = clamp(5.0*rayForward.y, 0.0, 1.0);
-        color = mix(vec3(0.0), vec3(0.35, 0.21, 0.26), sky_mix);
+        color = mix(vec3(0.0), sky_color, sky_mix);
     } else {
         vec3 baseColor;
         
@@ -279,7 +282,10 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
             baseColor = vec3(0.6);
         } else if(mr.material == EYE_MATERIAL) {
             float kick_wave = fract(-iBeats);
-            baseColor = mix(vec3(0.0), vec3(0.60, 0.57, 0.76), kick_wave);
+            vec3 eye_color = iRotate
+                           ? vec3(0.35, 0.21, 0.26) * 1.5
+                           : vec3(0.60, 0.57, 0.76);
+            baseColor = mix(vec3(0.0), eye_color, kick_wave);
         } else if(mr.material == TOOTH_MATERIAL) {
             baseColor = vec3(1.0);
         } else if(mr.material == GROUND_MATERIAL) {

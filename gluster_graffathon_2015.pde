@@ -132,19 +132,21 @@ class GreezScene extends Scene {
     clear();
     shader(sprunge);
     
-    String[] groups = {"", "<3", "", "Peisik", "", "REN", "", "firebug", "", "sooda", "", "Epoch", "", "pants^", "", "Paraguay", "", "Mercury", "", "DOT"};
-    int i = floor(beats / duration * groups.length);
+    String[] groups = {"Peisik", "REN", "Epoch", "pants^", "Paraguay", "Mercury", "firebug\nsooda", "DOT"};
+    int i = floor(0.25 * beats);
     
-    if(groups[i].equals(""))
-      sprunge.set("iSaturation", 1.0);
-    else
+    boolean showHeart = 0.0 <= beats && beats < 2.0;
+    boolean showGroup = beats % 4.0 >= 3.0; 
+    
+    if(showGroup) {
       sprunge.set("iSaturation", 0.0);
+    } else {
+      sprunge.set("iSaturation", 1.0);      
+    }
+
     sprunge.set("iGlobalTime", beatsToSecs(beats));
     rect(0, 0, width, height);
     resetShader();  
-    
-
-          
     
     float timePerText = duration/groups.length;
     float timePassed = 0.0;
@@ -152,10 +154,15 @@ class GreezScene extends Scene {
     fill(255, 0, 100);
     textSize(32);
     textAlign(CENTER, CENTER);
-
-    text(groups[i], width/2.0, height/2.0, 0);
-
-   
+      
+    String msg = "";
+    if(showGroup) {
+      msg = groups[i];
+    } else if(showHeart) {
+      msg = "<3";
+      fill(200);
+    }
+    text(msg, width/2.0, height/2.0, 0);
   }
 }
 
@@ -352,10 +359,11 @@ class CreditsScene extends Scene {
 
 class SnowflakeScene extends Scene {
   PShader shader;
+  boolean reverse;
   
-  public SnowflakeScene(float duration) {
+  public SnowflakeScene(float duration, boolean reverse) {
     super(duration);
-    
+    this.reverse = reverse;
     shader = loadShader("clouds.glsl");
     shader.set("iResolution", (float)CANVAS_WIDTH, (float)CANVAS_HEIGHT);
   }
@@ -443,7 +451,7 @@ class SnowflakeScene extends Scene {
   
   void createFallingSnowFlake(int time, int level, int branches, float x, float y, float angle, boolean isFirstCall) {
       pushMatrix();
-      float yTranslate = -( 20 - (time*(0.0005 + 0.0005 * abs(y)/2.0) % (40)));
+      float yTranslate = (reverse ? 1.0 : -1.0)*( 20 - (time*(0.0005 + 0.0005 * abs(y)/2.0) % (40)));
       
       translate(x -1 + 2*sin(time*0.0005 + x), yTranslate);
       rotateZ(radians(time*0.005));
@@ -454,6 +462,7 @@ class SnowflakeScene extends Scene {
   }
   
   void draw(float beats) {
+    rectMode(CORNER);
     pushMatrix();
     translate(CANVAS_WIDTH/2.0, CANVAS_HEIGHT/2, -800); // needed in 3D mode
     scale((CANVAS_WIDTH/2.0)/ASPECT_RATIO, -CANVAS_HEIGHT/2.0);
@@ -466,7 +475,10 @@ class SnowflakeScene extends Scene {
     
     popMatrix();
     
-    float clouds_fade = pow(min(1.0, 1.0 - beats / 32.0), 2.0);
+    float clouds_fade = 0.0;
+    if(!reverse) {
+      clouds_fade = pow(min(1.0, 1.0 - beats / 32.0), 2.0);
+    }
     shader.set("iFade", clouds_fade);
     shader.set("iBeats", beats);
     shader.set("iGlobalTime", beats);
@@ -475,7 +487,13 @@ class SnowflakeScene extends Scene {
     rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     resetShader();
     
-    float fade = max(0.0, min(1.0, beats < 16.0 ? 1.0 - beats / 16.0 : (beats - 56.0) / 8.0));
+    float fade = 0.0;
+    if(!reverse) {
+      fade = max(0.0, min(1.0, beats < 16.0 ? 1.0 - beats / 16.0 : (beats - 56.0) / 8.0));
+      
+    } else {
+      fade = max(0.0, min(1.0, (beats - 32.0) / 32.0));
+    }
     fill(0, 0, 0, 255.0 * fade);
     rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
@@ -720,9 +738,8 @@ void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
   timeline = new Timeline(this, "data/Vector Space Odyssey.mp3");
-  //timeline.addScene(new CylinderScene(32.0, true));
-  timeline.addScene(new SnowflakeScene(64.0));
-  timeline.addScene(new CylinderScene(32.0, false));
+  timeline.addScene(new SnowflakeScene(64.0, false));
+  timeline.addScene(new CylinderScene(32.0));
   timeline.addScene(new StairsScene2(32.0));
   timeline.addScene(new ShadertoyScene(64.0, "data/tunnel.frag")); // start at 128
   timeline.addScene(new RobotikScene(32.0, false));
@@ -730,12 +747,9 @@ void setup() {
   timeline.addScene(new RobotikScene(32.0, true));
   timeline.addScene(new CylinderScene(32.0, true));
   timeline.addScene(new GreezScene(32.0));
-
-  timeline.addScene(new CreditsScene(60.0));
+  timeline.addScene(new CreditsScene(32.0));
+  timeline.addScene(new SnowflakeScene(64.0, true));
   
-  timeline.addScene(new StairsScene2(64.0));
-  
-
   frameRate(60);
   background(0);
   fill(255);
@@ -775,7 +789,7 @@ void draw() {
     
     // Predelay ended, start the song
     predelay = false;
-    float offset = 290.0;
+    float offset = 0.0;
     timeline.song.play(round(offset * 1000.0 * BEAT_DURATION));
   }
   
