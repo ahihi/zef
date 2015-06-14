@@ -144,11 +144,12 @@ class CylinderScene extends Scene {
   }
   
   void draw(float beats) {
+      float secs = beatsToSecs(beats);
       pushMatrix();
       clear();
       rectMode(CORNER);
       shader(stardust);
-      stardust.set("iGlobalTime", (float)millis()*0.001);
+      stardust.set("iGlobalTime", secs);
       hint(DISABLE_DEPTH_TEST);
       rect(0, 0, width, height);
       hint(ENABLE_DEPTH_TEST);
@@ -167,7 +168,7 @@ class CylinderScene extends Scene {
       
             rotateZ(PI/2.0);
             rotateX(-5.8);
-            rotateY(millis()*0.0005);
+            rotateY(secs * 0.5);
             
             beginShape();
             texture(texture);
@@ -177,7 +178,11 @@ class CylinderScene extends Scene {
           popMatrix();
       endCamera();
       popMatrix();
-      }
+      
+      float fade = max(0.0, min(1.0, 1.0 - beats / 8.0));
+      fill(0, 0, 0, fade*255.0);
+      rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    }
 }
 
 class ShadertoyScene extends Scene {
@@ -186,19 +191,23 @@ class ShadertoyScene extends Scene {
   public ShadertoyScene(float duration, String shaderPath) {
     super(duration);
     this.shader = loadShader(shaderPath);
+    shader(this.shader);
+    resetShader();
   }
   
   public void setup() {
     noSmooth();
+    
     fill(255);
   }
   
   public void draw(float beats) {
     background(255);
-    filter(this.shader);
+    shader(this.shader);
     this.shader.set("iResolution", float(CANVAS_WIDTH), float(CANVAS_HEIGHT));
     this.shader.set("iBeats", beats);
     this.shader.set("iGlobalTime", beatsToSecs(beats));
+    rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
 }
 
@@ -379,11 +388,18 @@ class SnowflakeScene extends Scene {
     
     popMatrix();
     
-    shader.set("iGlobalTime", (float)beats);
+    float clouds_fade = pow(min(1.0, 1.0 - beats / 32.0), 2.0);
+    shader.set("iFade", clouds_fade);
+    shader.set("iBeats", beats);
+    shader.set("iGlobalTime", beats);
     shader(shader);
     fill(100, 100, 100, 0.5);
     rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     resetShader();
+    
+    float fade = max(0.0, min(1.0, beats < 16.0 ? 1.0 - beats / 16.0 : (beats - 56.0) / 8.0));
+    fill(0, 0, 0, 255.0 * fade);
+    rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
 }
 
@@ -395,6 +411,7 @@ class StairsScene extends Scene {
 
     shader = loadShader("clouds.glsl");
     shader.set("iResolution", (float)CANVAS_WIDTH, (float)CANVAS_HEIGHT);
+    shader.set("iFade", 0.0);
   }
   
   void setup() {
@@ -592,8 +609,8 @@ class RotatingObjectScene extends Scene {
 }
 
 // Constants
-int CANVAS_WIDTH = 1920;//1024;
-int CANVAS_HEIGHT = 1080;//768;
+int CANVAS_WIDTH = 1920/2;
+int CANVAS_HEIGHT = 1080/2;
 float ASPECT_RATIO = (float)CANVAS_WIDTH/CANVAS_HEIGHT;
 float TEMPO = 123.0; // beats/minute
 float BEAT_DURATION = 60.0 / TEMPO; // seconds 
@@ -608,15 +625,14 @@ void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
   timeline = new Timeline(this, "assets/Vector Space Odyssey.mp3");
+  timeline.addScene(new SnowflakeScene(64.0));
+  timeline.addScene(new CylinderScene(32.0));
+  timeline.addScene(new StairsScene(32.0));
+  timeline.addScene(new ShadertoyScene(64.0, "assets/tunnel.frag")); // start at 128
   
-  timeline.addScene(new CylinderScene(60.0));
-  timeline.addScene(new StairsScene(64.0));
-  timeline.addScene(new SnowflakeScene(60.0));
-  timeline.addScene(new RotatingObjectScene(60.0));
   timeline.addScene(new CreditsScene(60.0));
   timeline.addScene(new RotatingObjectScene(60.0));
-  // Tunnel should start at 64 beats
-  timeline.addScene(new ShadertoyScene(64.0, "assets/tunnel.frag"));
+  timeline.addScene(new StairsScene(64.0));
 
   frameRate(60);
   background(0);

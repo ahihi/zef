@@ -21,7 +21,11 @@ uniform vec2 iResolution;
 // ...
 
 vec2 rect2polar(vec2 p) {
-    return vec2(atan(p.y, p.x), length(p));
+    if(p.x == 0.0 && p.y == 0.0) {
+        return vec2(0.0, 0.0);
+    } else {
+        return vec2(atan(p.y, p.x), length(p));            
+    }
 }
 
 vec2 polar2rect(vec2 p) {

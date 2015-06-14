@@ -1,5 +1,7 @@
+uniform float iBeats;
 uniform float iGlobalTime;
 uniform vec2 iResolution;
+uniform float iFade;
 
 float random(vec2 co){
     return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
@@ -39,5 +41,6 @@ void main()
 	uv-=vec2(0.5);
 	color = color*(1.0-length(uv)*length(uv));
 	color = (color + vec3(0.0, 0.0, 0.0))/2.0;
-	gl_FragColor = vec4(color,0.5);
+        
+	gl_FragColor = vec4(color,(1.0-iFade)*0.5);
 }
