@@ -243,9 +243,11 @@ class CylinderScene extends Scene {
       endCamera();
       popMatrix();
       
-      float fade = max(0.0, min(1.0, 1.0 - beats / 8.0));
-      fill(0, 0, 0, fade*255.0);
-      rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      if(!shakeIt) {
+        float fade = max(0.0, min(1.0, 1.0 - beats / 8.0));
+        fill(0, 0, 0, fade*255.0);
+        rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      }
     }
 }
 
@@ -492,7 +494,7 @@ class SnowflakeScene extends Scene {
       fade = max(0.0, min(1.0, beats < 16.0 ? 1.0 - beats / 16.0 : (beats - 56.0) / 8.0));
       
     } else {
-      fade = max(0.0, min(1.0, (beats - 32.0) / 32.0));
+      fade = max(0.0, min(1.0, (beats - 24.0) / 40.0));
     }
     fill(0, 0, 0, 255.0 * fade);
     rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -739,7 +741,7 @@ void setup() {
 
   timeline = new Timeline(this, "data/Vector Space Odyssey.mp3");
   timeline.addScene(new SnowflakeScene(64.0, false));
-  timeline.addScene(new CylinderScene(32.0));
+  timeline.addScene(new CylinderScene(32.0, false));
   timeline.addScene(new StairsScene2(32.0));
   timeline.addScene(new ShadertoyScene(64.0, "data/tunnel.frag")); // start at 128
   timeline.addScene(new RobotikScene(32.0, false));
