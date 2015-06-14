@@ -356,7 +356,7 @@ class SnowflakeScene extends Scene {
   
   void createFallingSnowFlake(int time, int level, int branches, float x, float y, float angle, boolean isFirstCall) {
       pushMatrix();
-      float yTranslate = 20 - (time*(0.0005 + 0.0005 * abs(y)/2.0) % (40));
+      float yTranslate = -( 20 - (time*(0.0005 + 0.0005 * abs(y)/2.0) % (40)));
       
       translate(x -1 + 2*sin(time*0.0005 + x), yTranslate);
       rotateZ(radians(time*0.005));
@@ -399,6 +399,83 @@ class StairsScene extends Scene {
   
   void setup() {
     noStroke();
+    background(10, 2, 12);
+  }
+  
+  void draw(float beats) {
+    clear();
+    
+    int time = round(beatsToSecs(beats) * 1000.0);
+    
+    shader.set("iGlobalTime", (float)sin(time*0.001));
+
+    pushMatrix();
+    translate(CANVAS_WIDTH/2, CANVAS_HEIGHT/2,-0.3*CANVAS_WIDTH); // needed in 3D mode
+    lights();
+    rotateY(-time * 0.0005);
+    translate(0, time * 0.1, 0);
+    fill(36, 36, 67);
+    float towerWidth = CANVAS_WIDTH/4;
+    int towerHeight = 5*CANVAS_HEIGHT;
+    translate(0, -1.5*CANVAS_HEIGHT, 0);
+    
+    //filter(shader);
+    
+    shader(shader);
+    box(towerWidth, towerHeight, towerWidth);
+    resetShader();
+    
+    
+    int amountOfStairs = 5;
+    float stairWidth = towerWidth/amountOfStairs;
+    float stairHeight = CANVAS_WIDTH/100;
+    float stairDepth = towerWidth/10;
+    //float stairDepth = stairWidth;
+    float heightDifferenceBetweenSteps = (int) (1.7 * stairHeight);
+    translate(-0.5*towerWidth, 1.1*CANVAS_HEIGHT, (towerWidth + stairDepth)/2);
+    
+    for (int k = 0; k < 25; k++) {
+      for (int i = 0; i < amountOfStairs; i++) {
+        fill(10, 2, 12);
+        
+        if((beats % 2.0 < 1.0) && ((i % 3.0 * time*0.001) < 1.0)) {
+          fill(152, 146, 193);
+          fill(36, 36, 67);
+          fill(1.5*20, 1.5*4, 1.5*24);
+        }
+        if ((beats % 4.0 < 1.0) && (((i*k+i) * 0.1*beats) % 2.0 < 1.0)) {
+          fill(191, 189, 191);
+          //fill(89, 54, 67);
+          fill(152, 146, 193);
+        }
+        
+        translate(stairWidth, -heightDifferenceBetweenSteps, 0);
+        box(stairWidth, stairHeight, stairDepth);
+      }
+      
+      rotateY(PI/2);
+      
+      translate((stairDepth)/2, 0, (stairDepth)/2);
+    }
+
+    popMatrix();
+    
+    resetShader();
+  }
+}
+
+class StairsScene2 extends Scene {
+  PShader shader;
+  
+  public StairsScene2(float duration) {
+    super(duration);
+
+    shader = loadShader("clouds.glsl");
+    shader.set("iResolution", (float)CANVAS_WIDTH, (float)CANVAS_HEIGHT);
+  }
+  
+  void setup() {
+    noStroke();
   }
   
   void draw(float beats) {
@@ -413,7 +490,7 @@ class StairsScene extends Scene {
     lights();
     rotateY(-time * 0.0005);
     translate(0, time * 0.05, 0);
-    fill(100, 100, 100);
+    fill(36, 36, 67);
     float towerWidth = CANVAS_WIDTH/4;
     int towerHeight = 4*CANVAS_HEIGHT;
     translate(0, -CANVAS_HEIGHT, 0);
@@ -421,25 +498,24 @@ class StairsScene extends Scene {
     //filter(shader);
     
     shader(shader);
-    box(towerWidth, towerHeight, towerWidth);
+    //box(towerWidth, towerHeight, towerWidth);
     resetShader();
     
-
     
     int amountOfStairs = 5;
     float stairWidth = towerWidth/amountOfStairs;
     float stairHeight = CANVAS_WIDTH/100;
-    float stairDepth = towerWidth/10;
+    float stairDepth = stairWidth;
     //float stairDepth = stairWidth;
     float heightDifferenceBetweenSteps = (int) (1.7 * stairHeight);
     translate(-0.5*towerWidth, 1.1*CANVAS_HEIGHT, (towerWidth + stairDepth)/2);
     
     for (int k = 0; k < 28; k++) {
       for (int i = 0; i < amountOfStairs; i++) {
-        fill(100+150/((i*k+k) + 1), 100, 150);
+        fill(36, 36, 67, 200/(i+1));
         
         if(beats % 2.0 < 1.0 && (i+k+time*0.001) % 3.0 < 1.0) {
-          fill(255, 255, 255);
+          fill(152, 146, 193);
         }
         
         translate(stairWidth, -heightDifferenceBetweenSteps, 0);
@@ -484,14 +560,14 @@ class RotatingObjectScene extends Scene {
 
     pushMatrix();
 
-    translate(CANVAS_WIDTH/2, CANVAS_HEIGHT/2,-0.3*CANVAS_WIDTH); // needed in 3D mode
+    translate(CANVAS_WIDTH/2, CANVAS_HEIGHT/2,-0.5*CANVAS_WIDTH); // needed in 3D mode
     lights();
     
     if (beats%2 < 1.0) {
-      scale(15.0);
+      scale(24.0);
     }
     else {
-      scale(14.0);
+      scale(20.0);
     }
     
     this.shader.set("iGlobalTime", beatsToSecs(beats));
@@ -500,7 +576,7 @@ class RotatingObjectScene extends Scene {
     rotateX(sin(time*0.001));
     rotateY(cos(time*0.0001));
     rotateZ(sin(time*0.0001)*cos(time*0.001));
-    translate(10*sin(time*0.001), 10*cos(time*0.001), sin(time*0.01));
+    translate(30*sin(time*0.001), 30*cos(time*0.001), 0.7*sin(time*0.01));
     shader(shader2);
     shape(metalObject, 0, 0);
     resetShader();
@@ -516,8 +592,8 @@ class RotatingObjectScene extends Scene {
 }
 
 // Constants
-int CANVAS_WIDTH = 1024;
-int CANVAS_HEIGHT = 768;
+int CANVAS_WIDTH = 1920;//1024;
+int CANVAS_HEIGHT = 1080;//768;
 float ASPECT_RATIO = (float)CANVAS_WIDTH/CANVAS_HEIGHT;
 float TEMPO = 123.0; // beats/minute
 float BEAT_DURATION = 60.0 / TEMPO; // seconds 
@@ -532,11 +608,13 @@ void setup() {
   size(CANVAS_WIDTH, CANVAS_HEIGHT, P3D);
 
   timeline = new Timeline(this, "assets/Vector Space Odyssey.mp3");
-  timeline.addScene(new CylinderScene(60.0));
-  timeline.addScene(new CreditsScene(60.0));
+  
+  timeline.addScene(new StairsScene(64.0));
   timeline.addScene(new SnowflakeScene(60.0));
   timeline.addScene(new RotatingObjectScene(60.0));
-  timeline.addScene(new StairsScene(64.0));
+  timeline.addScene(new CylinderScene(60.0));
+  timeline.addScene(new CreditsScene(60.0));
+  timeline.addScene(new RotatingObjectScene(60.0));
   // Tunnel should start at 64 beats
   timeline.addScene(new ShadertoyScene(64.0, "assets/tunnel.frag"));
 
