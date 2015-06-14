@@ -1,6 +1,7 @@
 uniform float iBeats;
 uniform float iGlobalTime;
 uniform vec2 iResolution;
+uniform bool iRotate;
 
 #define TAU 6.283185307179586
 
@@ -148,18 +149,27 @@ ObjectDistance sceneDistance(vec3 p) {
     
     vec3 q = p;//vec3((mod(p.x, 2.0) - 1.0) * 1.05, p.yz);
     //float t = iGlobalTime - 0.2*floor(p.x/2.0);
-    float jump = abs(sin(0.25 * (iBeats + 1.0) * TAU));
+    float jump = 1.5*abs(sin(0.25 * (iBeats + 1.0) * TAU));
     q.y -= jump;
     
-    // do the rotation thing
-    /*vec2 q_zy_p = rect2polar(q.zy);
-    vec2 q2_zy_p = q_zy_p + vec2(-4.0*t, 0.0);
-    vec2 q2_zy = polar2rect(q2_zy_p);
-    vec3 q2 = vec3(q.x, q2_zy.yx);*/
+    vec3 q2 = q;
+    if(iRotate && fract(0.25 * (iBeats + 1.0)) < 0.5) {
+        float rot_sign = -1.0;
+        float beat8 = fract((iBeats + 5.0) / 8.0);
+        
+        if((0.5 <= beat8) && p.x < 0.0) {
+            rot_sign = 1.0;
+        }
+        // do the rotation thing
+        vec2 q_zy_p = rect2polar(q.zy);
+        vec2 q2_zy_p = q_zy_p + vec2(rot_sign * 0.5 * (iBeats + 1.0) * TAU, 0.0);
+        vec2 q2_zy = polar2rect(q2_zy_p);
+        q2 = vec3(q.x, q2_zy.yx);
+    }
     
     od = distanceUnion(
         od,
-        robot(q)
+        robot(q2)
     );
             
     return od;
@@ -241,7 +251,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
 	vec2 pxPos = 2.0*(0.5 * iResolution.xy - fragCoord.xy) / iResolution.xx;
     
     vec2 camXZ = polar2rect(vec2(-TAU/4.0 + 0.3 * iGlobalTime, 3.0));
-  	vec3 camPos = vec3(camXZ.x, 1.0 + 0.5 * sin(1.0 * iGlobalTime), camXZ.y);
+  	vec3 camPos = vec3(camXZ.x, 1.0 + 0.7 * sin(1.0 * iGlobalTime), camXZ.y);
     camPos = focus() + vec3(2.0*sin(0.6*iGlobalTime), 2.0, -6.5);
     
     vec3 camLook = focus();
@@ -258,10 +268,10 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
     	
     vec3 rayEnd = camPos + mr.length * rayForward;
     vec3 color;
-    vec3 bgColor = vec3(0.1);
     
     if(mr.material == NO_MATERIAL) {
-        color = bgColor;
+        float sky_mix = clamp(5.0*rayForward.y, 0.0, 1.0);
+        color = mix(vec3(0.0), vec3(0.35, 0.21, 0.26), sky_mix);
     } else {
         vec3 baseColor;
         
@@ -269,7 +279,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
             baseColor = vec3(0.6);
         } else if(mr.material == EYE_MATERIAL) {
             float kick_wave = fract(-iBeats);
-            baseColor = mix(vec3(0.0), vec3(1.0, 0.0, 0.0), kick_wave);
+            baseColor = mix(vec3(0.0), vec3(0.60, 0.57, 0.76), kick_wave);
         } else if(mr.material == TOOTH_MATERIAL) {
             baseColor = vec3(1.0);
         } else if(mr.material == GROUND_MATERIAL) {
@@ -295,8 +305,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
         ));
 
        	vec2 lightXZ = polar2rect(vec2(-0.5 * iGlobalTime, 3.0));
-        vec3 lightPos = vec3(lightXZ.x, 10.0, lightXZ.y);
-		lightPos = camPos * vec3(1.0, 1.0, 1.0);
+        vec3 lightPos = camPos + vec3(0.0, 2.0, 0.0);
         
         float ambient = 0.2;
         float diffuse = max(0.0, dot(normal, normalize(lightPos - rayEnd)));

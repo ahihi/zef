@@ -257,6 +257,25 @@ class ShadertoyScene extends Scene {
   }
 }
 
+class RobotikScene extends ShadertoyScene {
+  public boolean rotate;
+  
+  public RobotikScene(float duration, boolean rotate) {
+    super(duration, "data/robotik.frag");
+    this.rotate = rotate;
+  }
+  
+  public void draw(float beats) {
+    background(0);
+    shader(this.shader);
+    this.shader.set("iResolution", float(CANVAS_WIDTH), float(CANVAS_HEIGHT));
+    this.shader.set("iBeats", beats);
+    this.shader.set("iGlobalTime", beatsToSecs(beats));
+    this.shader.set("iRotate", this.rotate);
+    rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  }
+}
+
 class CreditsScene extends Scene {
   public PShader shader;
   
@@ -673,8 +692,8 @@ class RotatingObjectScene extends Scene {
 }
 
 // Constants
-int CANVAS_WIDTH = 1024;
-int CANVAS_HEIGHT = 768;
+int CANVAS_WIDTH = 1280;
+int CANVAS_HEIGHT = 720;
 float ASPECT_RATIO = (float)CANVAS_WIDTH/CANVAS_HEIGHT;
 float TEMPO = 123.0; // beats/minute
 float BEAT_DURATION = 60.0 / TEMPO; // seconds 
@@ -690,16 +709,22 @@ void setup() {
 
   timeline = new Timeline(this, "data/Vector Space Odyssey.mp3");
   
-  timeline.addScene(new GreezScene(30.0));
   timeline.addScene(new SnowflakeScene(64.0));
   timeline.addScene(new CylinderScene(32.0));
   timeline.addScene(new StairsScene2(32.0));
-  timeline.addScene(new ShadertoyScene(64.0, "data/robotik.frag"));
   timeline.addScene(new ShadertoyScene(64.0, "data/tunnel.frag")); // start at 128
+  timeline.addScene(new RobotikScene(32.0, false));
+  timeline.addScene(new RotatingObjectScene(36.0));
   
+
+  timeline.addScene(new RobotikScene(32.0, true));
+  timeline.addScene(new CylinderScene(32.0));
+  timeline.addScene(new GreezScene(32.0));
+
   timeline.addScene(new CreditsScene(60.0));
-  timeline.addScene(new RotatingObjectScene(60.0));
+  
   timeline.addScene(new StairsScene2(64.0));
+  
 
   frameRate(60);
   background(0);
@@ -740,7 +765,7 @@ void draw() {
     
     // Predelay ended, start the song
     predelay = false;
-    float offset = 0.0;
+    float offset = 128.0 + 96.0 + 32.0;
     timeline.song.play(round(offset * 1000.0 * BEAT_DURATION));
   }
   
