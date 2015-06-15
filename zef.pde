@@ -132,7 +132,7 @@ class GreezScene extends Scene {
     clear();
     shader(sprunge);
     
-    String[] groups = {"Peisik", "REN", "Epoch", "pants^", "Paraguay", "Mercury", "firebug\nsooda", "DOT"};
+    String[] groups = {"Peisik", "REN", "Epoch", "pants^2", "Paraguay", "Mercury", "firebug\nsooda", "DOT"};
     int i = floor(0.25 * beats);
     
     boolean showHeart = 0.0 <= beats && beats < 2.0;
